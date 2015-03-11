@@ -1,0 +1,52 @@
+
+HAProxy
+========
+
+## 安装
+yum install haproxy
+
+安装后就增加了haproxy用户和用户组
+
+## 配置文件
+/etc/haproxy/haproxy.cfg
+
+
+## 启动准备
+默认的配置文件 haproxy.cfg，无需修改即可启动。
+启动4个后端web服务在5001 5002 5003 5004 端口。
+
+	......
+	backend app
+		balance     roundrobin
+		server  app1 127.0.0.1:5001 check
+		server  app2 127.0.0.1:5002 check
+		server  app3 127.0.0.1:5003 check
+		server  app4 127.0.0.1:5004 check
+		
+## 启动web服务器
+假如使用node演示
+
+5001.js（5002/3/4.js 类似）
+	var http = require('http');
+	http.createServer(function (req, res) {
+	  res.writeHead(200, {'Content-Type': 'text/plain'});
+	  res.end('Hello 5001\n');
+	}).listen(5001);
+	console.log('Server running at 5001');
+	
+	
+创建4个js文件（需要安装nodejs）
+node 5001.js &
+启动一个后，ctrl + C 中断命令行，此时web服务还在继续。
+另外几个也类似启动
+
+
+## 启动
+haproxy -f /etc/haproxy/haproxy.cfg
+
+
+## 访问
+
+分别访问 http://{ip}:5001/2/3/4 看是否正常
+然后再访问 http://{ip}:5000
+多刷新页面，看看输出内容是否变化

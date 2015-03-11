@@ -1,0 +1,139 @@
+
+HAProxy 启动参数
+================
+
+Usage : haproxy [-f <cfgfile>]* [ -vdVD ] [ -n <maxconn> ] [ -N <maxpconn> ]
+        [ -p <pidfile> ] [ -m <max megs> ] [ -C <dir> ]
+        -v displays version ; -vv shows known build options.
+        -d enters debug mode ; -db only disables background mode.
+        -dM[<byte>] poisons memory with <byte> (defaults to 0x50)
+        -V enters verbose mode (disables quiet mode)
+        -D goes daemon ; -C changes to <dir> before loading files.
+        -q quiet mode : don't display messages
+        -c check mode : only check config files and exit
+        -n sets the maximum total # of connections (2000)
+        -m limits the usable amount of memory (in MB)
+        -N sets the default, per-proxy maximum # of connections (2000)
+        -L set local peer name (default to hostname)
+        -p writes pids of all children to this file
+        -de disables epoll() usage even when available
+        -dp disables poll() usage even when available
+        -dS disables splice usage (broken on old kernels)
+        -dV disables SSL verify on servers side
+        -sf/-st [pid ]* finishes/terminates old pids. Must be last arguments.
+	
+## -vv
+显示版本号和编译参数。
+Display HAProxy's version and all build options.
+	
+	haproxy -vv 显示如下信息：
+	
+	HA-Proxy version 1.5.2 2014/07/12
+	Copyright 2000-2014 Willy Tarreau <w@1wt.eu>
+
+	Build options :
+	  TARGET  = linux2628
+	  CPU     = generic
+	  CC      = gcc
+	  CFLAGS  = -O2 -g -fno-strict-aliasing
+	  OPTIONS = USE_LINUX_TPROXY=1 USE_ZLIB=1 USE_REGPARM=1 USE_OPENSSL=1 USE_PCRE=1
+
+	Default settings :
+	  maxconn = 2000, bufsize = 16384, maxrewrite = 8192, maxpollevents = 200
+
+	Encrypted password support via crypt(3): yes
+	Built with zlib version : 1.2.7
+	Compression algorithms supported : identity, deflate, gzip
+	Built with OpenSSL version : OpenSSL 1.0.1e-fips 11 Feb 2013
+	Running on OpenSSL version : OpenSSL 1.0.1e-fips 11 Feb 2013
+	OpenSSL library supports TLS extensions : yes
+	OpenSSL library supports SNI : yes
+	OpenSSL library supports prefer-server-ciphers : yes
+	Built with PCRE version : 8.32 2012-11-30
+	PCRE library supports JIT : no (USE_PCRE_JIT not set)
+	Built with transparent proxy support using: IP_TRANSPARENT IPV6_TRANSPARENT IP_FREEBIND
+
+	Available polling systems :
+		  epoll : pref=300,  test result OK
+		   poll : pref=200,  test result OK
+		 select : pref=150,  test result OK
+	Total: 3 (3 usable), will use epoll.
+	
+## -d
+前台，debug 模式。连接、断开、HTTP headers等信息会打印到控制台。
+
+## -db
+禁用 daemon 模式，进程可以使用 ctrl + C 结束
+
+
+## -dM ???
+
+Initializes all allocated memory areas with the given <byte>. This makes it easier to detect bugs resulting from uninitialized memory accesses, at the expense  of  touching 
+all allocated memory once. If <byte> is not specified, it defaults to 0x50 (ASCII 'P').
+
+
+## -V
+Displays messages on output even when -q or 'quiet' are specified. Some information about pollers and config file are displayed during startup.
+
+
+## -C ?
+加载文件之前，修改目录到指定路径下。
+Change directory to <dir> before loading any files.
+
+## -q
+安静模式，不显示信息。
+quiet mode : don't display messages
+
+## -c
+仅检查配置文件。
+only check config files and exit
+
+## -n
+设置总的最大并发数
+sets the maximum total # of connections (2000)
+
+## -m ? 需要指定吗？有什么用？
+限制最大可用内存(in MB)
+
+## -N
+设置每组代理的并发数
+sets the default, per-proxy maximum # of connections (2000)
+
+## -L ?
+Set the local instance's peer name. Peers  are  defined  in  the
+peers  configuration  section  and used for syncing stick tables
+between different instances. If this option  is  not  specified,
+the local hostname is used as peer name.
+
+## -p
+Ask the process to write down each of  its  children's  pids  to
+this file in daemon mode.
+
+## -de
+（用不到）禁用epoll，某些过时linux版本可能不支持epoll
+
+注释：
+在Linux Socket服务器短编程时，为了处理大量客户的连接请求，需要使用非阻塞I/O和复用，select、poll和epoll是Linux API提供的I/O复用方式，自从Linux 2.6中加入了epoll之后，在高性能服务器领域得到广泛的应用，现在比较出名的nginx就是使用epoll来实现I/O复用支持高并发，目前在高并 发的场景下，nginx越来越收到欢迎。
+
+## -dp
+（用不到）禁用poll
+
+## -dS
+（用不到）禁用splice，旧的linux内核对它支持的不好
+Disables use of splice(2), which is broken on older kernels.
+
+## -dV ?
+禁用服务器端SSL校验
+disables SSL verify on servers side
+
+## -st
+Send TERMINATE signal to the pids in pidlist after startup.  The
+processes which receive this signal will wait immediately termi‐
+nate, closing all active sessions. This option must be specified
+last,  followed  by  any  number  of PIDs. Technically speaking,
+SIGTTOU and SIGTERM are sent.
+
+
+
+			  
+			  
