@@ -24,8 +24,10 @@ yum install haproxy
 		server  app4 127.0.0.1:5004 check
 		
 ## 启动web服务器
-假如使用node演示
 
+### 假如使用node演示
+
+创建4个js文件（需要安装nodejs）
 5001.js（5002/3/4.js 类似）
 	var http = require('http');
 	http.createServer(function (req, res) {
@@ -35,7 +37,7 @@ yum install haproxy
 	console.log('Server running at 5001');
 	
 	
-创建4个js文件（需要安装nodejs）
+### node 启动
 node 5001.js &
 启动一个后，ctrl + C 中断命令行，此时web服务还在继续。
 另外几个也类似启动
