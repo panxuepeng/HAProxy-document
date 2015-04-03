@@ -1,6 +1,71 @@
 
-HAProxy
-========
+HAProxy 编译安装
+================
 
-## 编译安装
+## 编译命令
 
+make TARGET=linux2628  ARCH=x86_64 USE_ZLIB=1 USE_PCRE=1
+或者
+make TARGET=linux2628  ARCH=x86_64 USE_ZLIB=1 USE_STATIC_PCRE=1
+
+
+## 参数 TARGET
+
+TARGET 参数必须指定，指定linux内核版本，可选值如下：
+	
+  - linux22     for Linux 2.2
+  - linux24     for Linux 2.4 and above (default)
+  - linux24e    for Linux 2.4 with support for a working epoll (> 0.21)
+  - linux26     for Linux 2.6 and above
+  - linux2628   for Linux 2.6.28, 3.x, and above (enables splice and tproxy)
+  - solaris     for Solaris 8 or 10 (others untested)
+  - freebsd     for FreeBSD 5 to 10 (others untested)
+  - osx         for Mac OS/X
+  - openbsd     for OpenBSD 3.1 to 5.2 (others untested)
+  - aix51       for AIX 5.1
+  - aix52       for AIX 5.2
+  - cygwin      for Cygwin
+  - generic     for any other OS or version.
+  - custom      to manually adjust every setting
+  
+  
+### splice
+
+减少拷贝数据的cpu占用
+
+	在defaults frontend listen backend加入
+	自动判断splice能否提供更好的性能，而选择之
+	option splice_auto
+	对请求采用splice转发
+	option splice_request
+	对回复采用splice转发
+	option splice_response
+	
+### tproxy
+
+	全透明代理
+	
+  
+## 参数 ARCH
+
+用来指定要编译32位或64位二进制文件
+
+
+## 参数 USE_ZLIB
+
+It is also possible to include native support for ZLIB to benefit from HTTP
+compression. For this, pass "USE_ZLIB=1" on the "make" command line and ensure
+that zlib is present on the system.
+
+问题： 该参数意思是支持gzip压缩，但如何在配置文件里体现出来 USE_ZLIB=1 的作用？
+
+
+## 参数 USE_PCRE 或 USE_STATIC_PCRE
+
+If your system supports PCRE (Perl Compatible Regular Expressions), then you
+really should build with libpcre which is between 2 and 10 times faster than
+other libc implementations.
+
+USE_STATIC_PCRE=1 to use a static version of libpcre even if the dynamic
+one is available. This will enhance portability.
+ 

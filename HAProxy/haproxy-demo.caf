@@ -56,6 +56,11 @@ defaults
     timeout http-keep-alive 10s
     timeout check           10s
     maxconn                 3000
+	
+    stats enable
+	stats hide-version
+	stats uri /haproxy?stats
+    stats auth admin:111111
 
 #---------------------------------------------------------------------
 # main frontend which proxys to the backends
@@ -83,3 +88,33 @@ backend app
     server  app2 127.0.0.1:5002 check
     server  app3 127.0.0.1:5003 check
     server  app4 127.0.0.1:5004 check
+	
+
+#问题：
+#根据官方文档，负载均衡算法 roundrobin 貌似会动态调整。
+#（“This algorithm is dynamic, which means that server weights 
+# may be adjusted on the fly for slow starts for instance.”）
+#这个调整是怎么个调整，比如可能会根据后端服务器的响应时间等因素，
+#在指定的权重基础上进行调整？
+
+	
+#admin.abc.cn
+listen admin 124.194.10.203:80,192.168.6.203:80 
+	mode http
+        balance roundrobin
+        option forwardfor
+        server book-1 192.168.6.161:80 maxconn 2048 weight 50 check inter 3000 fall 3
+        server book-2 192.168.6.162:80 maxconn 2048 weight 50 check inter 3000 fall 3
+        server book-3 192.168.6.163:80 maxconn 2048 weight 50 check inter 3000 fall 3
+        server book-4 192.168.6.164:80 maxconn 2048 weight 50 check inter 3000 fall 3
+		
+#book.abc.cn
+listen book 124.194.10.201:80,192.168.6.201:80
+	mode http
+        balance roundrobin
+        option forwardfor
+		cookie SERVERID insert indirect
+        server book-1 192.168.6.161:80 maxconn 2048 weight 50 cookie A check inter 3000 fall 3
+        server book-2 192.168.6.162:80 maxconn 2048 weight 50 cookie B check inter 3000 fall 3
+        server book-3 192.168.6.163:80 maxconn 2048 weight 50 cookie C check inter 3000 fall 3
+        server book-4 192.168.6.164:80 maxconn 2048 weight 50 cookie D check inter 3000 fall 3
